@@ -1,0 +1,88 @@
+@baseUrl = http://localhost:5000
+@cookie = {{login.response.headers.Set-Cookie}}
+
+### get all users
+GET {{baseUrl}}/api/users/all
+
+### signup
+POST {{baseUrl}}/api/users/signup
+Content-Type: application/json
+
+{
+    "email": "joaovictor2@gmail.com",
+    "name": "João Victor",
+    "password": "123456",
+    "username": "joaovictor2"
+}
+
+### login
+# @name login
+POST {{baseUrl}}/api/users/login
+Content-Type: application/json
+
+{
+    "username": "joaovictor",
+    "password": "123456"
+}
+
+
+### logout
+POST {{baseUrl}}/api/users/logout
+Cookie: {{cookie}}
+
+### follow
+POST {{baseUrl}}/api/users/follow/2
+Cookie: {{cookie}}
+
+###update user
+PUT {{baseUrl}}/api/users/update
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+    "bio": "I'm a software engineer",
+    "password": "123"
+}
+
+### profile
+GET {{baseUrl}}/api/users/profile/joaovictor
+
+### create post
+POST {{baseUrl}}/api/posts/create
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+    "text": "Hello World!",
+    "img": ""
+}
+
+### get a post
+GET {{baseUrl}}/api/posts/6
+
+### delete a post
+DELETE {{baseUrl}}/api/posts/1
+Cookie: {{cookie}}
+
+### like a post
+PUT {{baseUrl}}/api/posts/like/1
+Cookie: {{cookie}}
+
+### create a reply
+POST {{baseUrl}}/api/posts/reply/4
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+    "text": "Nice post!"
+}
+
+### get feed
+GET {{baseUrl}}/api/posts/feed
+Cookie: {{cookie}}
+
+###
+GET {{baseUrl}}/api/posts/user/drikdrik
+
+###
+DELETE {{baseUrl}}/api/posts/reply/5
