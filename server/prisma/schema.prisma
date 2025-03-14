@@ -23,6 +23,9 @@ model User {
   posts     Post[]
   replies   Reply[]
   liked     Like[]
+
+  sentMessages Message[]
+  conversations ConversationParticipant[]
 }
 
 model Follow {
@@ -71,4 +74,34 @@ model Reply {
   likes    Like[]
   PostedBy User @relation(fields: [authorId], references: [id])
   post     Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id        Int    @id @default(autoincrement())
+  messages  Message[]
+  participants ConversationParticipant[]
+  createdAt DateTime @default(now())
+}
+
+//relation table
+//[user1, user2] => [conversationId]
+model ConversationParticipant {
+  conversationId Int
+  userId         Int
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  user           User @relation(fields: [userId], references: [id])
+
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  senderId  Int
+  text   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  conversation  Conversation @relation(fields: [chatId], references: [id])
+  sender User @relation(fields: [senderId], references: [id])
 }

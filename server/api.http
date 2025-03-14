@@ -86,3 +86,19 @@ GET {{baseUrl}}/api/posts/user/drikdrik
 
 ###
 DELETE {{baseUrl}}/api/posts/reply/5
+
+### send a message
+POST {{baseUrl}}/api/messages/
+Content-Type: application/json
+Cookie: {{cookie}}
+
+{
+    "recipientId": 3,
+    "text": "Hello!"
+}
+
+### get messages
+GET {{baseUrl}}/api/messages/3
+
+### get conversations
+GET {{baseUrl}}/api/messages/conversation
