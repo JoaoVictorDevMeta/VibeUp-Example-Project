@@ -1,11 +1,12 @@
 import { Avatar, Divider, Flex, Text } from "@chakra-ui/react";
-import { BsThreeDots } from "react-icons/bs";
 import Actions from "./Actions";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import CommentActions from "./CommentActions";
+import getUserState from "../utils/getUserState";
 
 const Comment = ({ reply, lastReply }) => {
+  const user = getUserState();
 
   return (
     <>
@@ -26,7 +27,7 @@ const Comment = ({ reply, lastReply }) => {
                   locale: ptBR,
                 })}
               </Text>
-              <CommentActions />
+              {user.id === reply.PostedBy.id && <CommentActions replyId={reply.id}/>}
             </Flex>
           </Flex>
           <Text>{reply.text}</Text>

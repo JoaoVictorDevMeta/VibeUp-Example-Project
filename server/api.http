@@ -86,6 +86,7 @@ GET {{baseUrl}}/api/posts/user/drikdrik
 
 ###
 DELETE {{baseUrl}}/api/posts/reply/5
+Cookie: {{cookie}}
 
 ### send a message
 POST {{baseUrl}}/api/messages/

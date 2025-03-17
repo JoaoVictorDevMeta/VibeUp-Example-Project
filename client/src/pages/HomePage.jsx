@@ -4,6 +4,7 @@ import { Flex, Spinner } from "@chakra-ui/react";
 import Post from "../components/Post";
 import { useAtom } from "jotai";
 import { postAtom } from "../atoms/postAtom";
+import CreatePostBox from "../components/CreatePostBox";
 
 const HomePage = () => {
   const showToast = useShowToast();
@@ -32,6 +33,7 @@ const HomePage = () => {
 
   return (
     <>
+      <CreatePostBox />
       {loading && (
         <Flex justifyContent={"center"}>
           <Spinner size={"xl"} />

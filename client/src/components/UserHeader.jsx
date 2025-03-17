@@ -144,7 +144,7 @@ const UserHeader = ({ user }) => {
               <Portal>
                 <MenuList bg={"gray.dark"}>
                   <MenuItem bg={"gray.dark"} onClick={copyURL}>
-                    CopyLink
+                    Copiar Link
                   </MenuItem>
                 </MenuList>
               </Portal>
