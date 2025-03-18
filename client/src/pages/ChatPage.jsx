@@ -12,8 +12,35 @@ import {
 import Conversation from "../components/Conversation";
 import { GiConversation } from "react-icons/gi";
 import MessageContainer from "../components/MessageContainer";
+import { useEffect, useState } from "react";
+import useShowToast from "../hooks/useShowToast";
+import { useAtom } from "jotai";
+import { chatsAtom, selectedConversationAtom } from "../atoms/messagesAtom";
 
 const ChatPage = () => {
+  const showToast = useShowToast();
+  const [loadingChats, setLoadingChats] = useState(true);
+  const [chats, setChats] = useAtom(chatsAtom);
+  const [selectedConversation, _] = useAtom(selectedConversationAtom);
+
+  useEffect(() => {
+    const getConversation = async () => {
+      try {
+        const res = await fetch("/api/messages/conversation");
+        const data = await res.json();
+        if (data.error) {
+          showToast("Erro", data.error, "error");
+        }
+        setChats(data);
+      } catch (err) {
+        showToast("Erro", err.message, "error");
+      } finally {
+        setLoadingChats(false);
+      }
+    };
+    getConversation();
+  }, [showToast, setChats]);
+
   return (
     <Box
       position={"absolute"}
@@ -60,7 +87,7 @@ const ChatPage = () => {
             </Flex>
           </form>
 
-          {false &&
+          {loadingChats &&
             [0, 1, 2, 3, 4].map((_, index) => (
               <Flex
                 key={index}
@@ -79,25 +106,25 @@ const ChatPage = () => {
               </Flex>
             ))}
 
-          <Conversation />
-          <Conversation />
-          <Conversation />
-          <Conversation />
+          {!loadingChats &&
+            chats.map((chat) => <Conversation key={chat.id} chat={chat} />)}
         </Flex>
-        {/*<Flex
-          flex={70}
-          borderRadius={"md"}
-          p={2}
-          flexDir={"column"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          height={"400px"}
-        >
+        {!selectedConversation.id && (
+          <Flex
+            flex={70}
+            borderRadius={"md"}
+            p={2}
+            flexDir={"column"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            height={"400px"}
+          >
             <GiConversation size={100} />
             <Text>Selecione uma conversa para mandar mensagem</Text>
-        </Flex>*/}
-        
-        <MessageContainer/>
+          </Flex>
+        )}
+
+        {selectedConversation.id && <MessageContainer />}
       </Flex>
     </Box>
   );

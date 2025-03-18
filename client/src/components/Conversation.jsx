@@ -6,10 +6,21 @@ import {
   Image,
   Stack,
   Text,
+  useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
+import getUserState from "../utils/getUserState";
+import { BsCheck2All } from "react-icons/bs";
+import { useAtom } from "jotai";
+import { selectedConversationAtom } from "../atoms/messagesAtom";
 
-const Conversation = () => {
+const Conversation = ({chat}) => {
+  const user = chat.participants[0].user;
+  const currentUser = getUserState();
+  const lastMessage = chat.messages[0];
+  const [selectedConversation, setSelectedConversation] = useAtom(selectedConversationAtom);
+  const colorMode =  useColorMode().colorMode;
+
   return (
     <Flex
       gap={4}
@@ -20,6 +31,13 @@ const Conversation = () => {
         bg: useColorModeValue("gray.600", "gray.dark"),
         color: "white",
       }}
+      onClick={() => setSelectedConversation({
+        id: chat.id,
+        userId: user.id,
+        username: user.name,
+        userProfilePic: user.profilePic
+      })}
+      bg={selectedConversation?.id === chat.id ? (colorMode === "light" ? "gray.600" : "gray.dark") : ""}
       borderRadius={"md"}
     >
       <WrapItem>
@@ -29,7 +47,7 @@ const Conversation = () => {
             sm: "sm",
             md: "md",
           }}
-          src="https://bit.ly/broken-link"
+          src={user.profilePic}
         >
           <AvatarBadge boxSize={"1em"} bg={"green.500"} />
         </Avatar>
@@ -37,10 +55,13 @@ const Conversation = () => {
 
       <Stack direction={"column"} fontSize={"sm"}>
         <Text fontWeight={"700"} display={"flex"} alignItems={"center"}>
-          joaovictor <Image src="/verified.svg" w={4} h={4} ml={1} />
+          {user.name} <Image src="/verified.png" w={4} h={4} ml={1} />
         </Text>
         <Text fontSize={"xs"} display={"flex"} alignItems={"center"} gap={1}>
-          ei mermao, cade vc?
+          {lastMessage.senderId === currentUser.id ? <BsCheck2All size={16}/> : ""}
+          {lastMessage.text.length > 18 
+            ? `${lastMessage.text.substring(0, 18)}...`
+            : lastMessage.text}
         </Text>
       </Stack>
     </Flex>
