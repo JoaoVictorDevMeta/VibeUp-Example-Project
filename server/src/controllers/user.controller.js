@@ -24,6 +24,10 @@ const getUserProfile = async (req, res) => {
       },
     });
 
+    if(!user) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
     const { password: _, ...userInfo } = user;
 
     if (!userInfo) {

@@ -16,12 +16,40 @@ import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { useAtom } from "jotai";
 import { chatsAtom, selectedConversationAtom } from "../atoms/messagesAtom";
+import getUserState from "../utils/getUserState";
+import { useSocket } from "../hooks/useSocket";
 
 const ChatPage = () => {
-  const showToast = useShowToast();
   const [loadingChats, setLoadingChats] = useState(true);
   const [chats, setChats] = useAtom(chatsAtom);
-  const [selectedConversation, _] = useAtom(selectedConversationAtom);
+  const [selectedConversation, setSelectedConversation] = useAtom(
+    selectedConversationAtom
+  );
+  const [searchText, setSearchText] = useState("");
+  const [searchingUser, setSearchingUser] = useState(false);
+  const user = getUserState();
+  const showToast = useShowToast();
+  const { socket, onlineUsers } = useSocket();
+
+  useEffect(() => {
+    socket?.on("messagesSeen", ({ conversationId }) => {
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          if (chat.id === conversationId) {
+            return {
+              ...chat,
+              messages: chat.messages.map((message) => ({
+                ...message,
+                seen: true,
+              })),
+            };
+          }
+          return chat;
+        });
+        return updatedChats;
+      });
+    });
+  }, [socket, setChats]);
 
   useEffect(() => {
     const getConversation = async () => {
@@ -40,6 +68,69 @@ const ChatPage = () => {
     };
     getConversation();
   }, [showToast, setChats]);
+
+  const handleConversationSearch = async (e) => {
+    e.preventDefault();
+    setSearchingUser(true);
+    try {
+      if (!searchText) return;
+      if (searchText === user.username) {
+        showToast(
+          "Erro",
+          "Você não pode mandar mensagem para você mesmo",
+          "error"
+        );
+        return;
+      }
+
+      const res = await fetch(`/api/users/profile/${searchText}`);
+      const data = await res.json();
+
+      if (data.error) {
+        showToast("Erro", data.error, "error");
+        return;
+      }
+
+      const existingChat = chats.find(
+        (chat) => chat.participants[0].user.id === data.id
+      );
+      if (existingChat) {
+        setSelectedConversation({
+          id: existingChat.id,
+          userId: data.id,
+          username: data.username,
+          userProfilePic: data.profilePic,
+        });
+        return;
+      }
+
+      const mockConversation = {
+        mock: true,
+        messages: [
+          {
+            text: "",
+            sender: "",
+          },
+        ],
+        participants: [
+          {
+            user: {
+              id: data.id,
+              username: data.username,
+              profilePic: data.profilePic,
+            },
+          },
+        ],
+        id: Date.now(),
+      };
+
+      setChats((prev) => [...prev, mockConversation]);
+    } catch (err) {
+      showToast("Erro", err.message, "error");
+    } finally {
+      setSearchingUser(false);
+    }
+  };
 
   return (
     <Box
@@ -78,10 +169,14 @@ const ChatPage = () => {
           >
             Suas conversas
           </Text>
-          <form>
+          <form onSubmit={handleConversationSearch}>
             <Flex alignItems={"center"} gap={2}>
-              <Input placeholder="Procurar usuário"></Input>
-              <Button size={"sm"}>
+              <Input
+                placeholder="Procurar usuário"
+                onChange={(e) => setSearchText(e.target.value)}
+                value={searchText}
+              ></Input>
+              <Button size={"sm"} type="submit" isLoading={searchingUser}>
                 <SearchIcon />
               </Button>
             </Flex>
@@ -107,7 +202,15 @@ const ChatPage = () => {
             ))}
 
           {!loadingChats &&
-            chats.map((chat) => <Conversation key={chat.id} chat={chat} />)}
+            chats.map((chat) => (
+              <Conversation
+                key={chat.id}
+                isOnline={onlineUsers.includes(
+                  chat.participants[0].user.id.toString()
+                )}
+                chat={chat}
+              />
+            ))}
         </Flex>
         {!selectedConversation.id && (
           <Flex

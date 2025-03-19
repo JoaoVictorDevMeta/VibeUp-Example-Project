@@ -7,8 +7,9 @@ import { v2 as cloudinary } from "cloudinary";
 import userRoutes from "./src/routes/user.routes.js";
 import postRoutes from "./src/routes/post.routes.js";
 import messageRoutes from "./src/routes/message.routes.js";
+import { app, server } from "./src/socket/socket.js";
 
-const app = express();
+
 const PORT = process.env.PORT || 5000;
 
 cloudinary.config({
@@ -26,6 +27,6 @@ app.use("/api/users", userRoutes)
 app.use("/api/posts", postRoutes)
 app.use("/api/messages", messageRoutes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

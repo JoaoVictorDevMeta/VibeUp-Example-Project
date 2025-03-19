@@ -99,6 +99,7 @@ model Message {
   chatId    Int
   senderId  Int
   text   String
+  seen   Boolean @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
