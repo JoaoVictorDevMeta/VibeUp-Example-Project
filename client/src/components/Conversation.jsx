@@ -11,7 +11,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import getUserState from "../utils/getUserState";
-import { BsCheck2All } from "react-icons/bs";
+import { BsCheck2All, BsFillImageFill } from "react-icons/bs";
 import { useAtom } from "jotai";
 import { selectedConversationAtom } from "../atoms/messagesAtom";
 
@@ -85,7 +85,7 @@ const Conversation = ({ chat, isOnline }) => {
 
           {lastMessage.text.length > 18
             ? `${lastMessage.text.substring(0, 18)}...`
-            : lastMessage.text}
+            : lastMessage.text || <BsFillImageFill size={16}/>}
         </Text>
       </Stack>
     </Flex>

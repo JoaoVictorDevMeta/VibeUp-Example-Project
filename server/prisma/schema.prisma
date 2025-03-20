@@ -24,7 +24,7 @@ model User {
   replies   Reply[]
   liked     Like[]
 
-  sentMessages Message[]
+  sentMessages  Message[]
   conversations ConversationParticipant[]
 }
 
@@ -42,8 +42,8 @@ model Like {
   userId  Int
   postId  Int?
   replyId Int?
-  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post    Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?  @relation(fields: [postId], references: [id], onDelete: Cascade)
   reply   Reply? @relation(fields: [replyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
@@ -51,36 +51,36 @@ model Like {
 }
 
 model Post {
-  id    Int    @id @default(autoincrement())
-  authorId Int
-  text  String
-  img   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  likes Like[]
-  PostedBy User @relation(fields: [authorId], references: [id])
-  replies  Reply[]
-}
-
-model Reply {
-  id      Int    @id @default(autoincrement())
-  postId  Int
-  authorId Int
-  text    String
+  id        Int      @id @default(autoincrement())
+  authorId  Int
+  text      String
+  img       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   likes    Like[]
-  PostedBy User @relation(fields: [authorId], references: [id])
-  post     Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  PostedBy User    @relation(fields: [authorId], references: [id])
+  replies  Reply[]
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  authorId  Int
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  likes    Like[]
+  PostedBy User   @relation(fields: [authorId], references: [id])
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Conversation {
-  id        Int    @id @default(autoincrement())
-  messages  Message[]
+  id           Int                       @id @default(autoincrement())
+  messages     Message[]
   participants ConversationParticipant[]
-  createdAt DateTime @default(now())
+  createdAt    DateTime                  @default(now())
 }
 
 //relation table
@@ -89,7 +89,7 @@ model ConversationParticipant {
   conversationId Int
   userId         Int
   conversation   Conversation @relation(fields: [conversationId], references: [id])
-  user           User @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
 
   @@id([conversationId, userId])
 }
@@ -98,11 +98,12 @@ model Message {
   id        Int      @id @default(autoincrement())
   chatId    Int
   senderId  Int
-  text   String
-  seen   Boolean @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  text      String
+  img       String   @default("")
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  conversation  Conversation @relation(fields: [chatId], references: [id])
-  sender User @relation(fields: [senderId], references: [id])
+  conversation Conversation @relation(fields: [chatId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
 }

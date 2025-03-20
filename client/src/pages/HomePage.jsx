@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-import { Flex, Spinner } from "@chakra-ui/react";
+import { Box, Flex, Spinner } from "@chakra-ui/react";
 import Post from "../components/Post";
 import { useAtom } from "jotai";
 import { postAtom } from "../atoms/postAtom";
 import CreatePostBox from "../components/CreatePostBox";
+import SuggestedUsers from "../components/SuggestedUsers";
 
 const HomePage = () => {
   const showToast = useShowToast();
@@ -32,18 +33,26 @@ const HomePage = () => {
   }, [showToast, setPosts]);
 
   return (
-    <>
-      <CreatePostBox />
-      {loading && (
-        <Flex justifyContent={"center"}>
-          <Spinner size={"xl"} />
-        </Flex>
-      )}
-      {!loading && posts.length === 0 && <h1>Começe a seguir usuários para que seus posts apareçam aqui</h1>}
-      {!loading && posts.map((post) => (
-        <Post key={post.id} post={post} postedBy={post.PostedBy}/>
-      ))}
-    </>
+    <Flex gap={10}>
+      <Box flex={70}>
+        <CreatePostBox />
+        {loading && (
+          <Flex justifyContent={"center"}>
+            <Spinner size={"xl"} />
+          </Flex>
+        )}
+        {!loading && posts.length === 0 && (
+          <h1>Começe a seguir usuários para que seus posts apareçam aqui</h1>
+        )}
+        {!loading &&
+          posts.map((post) => (
+            <Post key={post.id} post={post} postedBy={post.PostedBy} />
+          ))}
+      </Box>
+      <Box flex={30}>
+        <SuggestedUsers />
+      </Box>
+    </Flex>
   );
 };
 

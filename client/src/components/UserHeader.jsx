@@ -12,23 +12,18 @@ import {
   MenuList,
   Button,
 } from "@chakra-ui/react";
-import { useState } from "react";
 import { Avatar } from "@chakra-ui/avatar";
 //icons
 import { BsGithub } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import { Link as RouterLink } from "react-router-dom";
 import getUserState from "../utils/getUserState";
-import useShowToast from "../hooks/useShowToast";
+import useFollowUnfollow from "../hooks/useFollowUnfollow";
 
 const UserHeader = ({ user }) => {
   const toast = useToast();
-  const showToast = useShowToast();
+  const { handleFollowUnfollow, updating, following } = useFollowUnfollow(user);
   const currentUser = getUserState();
-  const [following, setFollowing] = useState(
-    user.followers.some((follower) => follower.followingId === currentUser?.id)
-  );
-  const [ updating, setUpdating ] = useState(false);
 
   const copyURL = () => {
     const currentURL = window.location.href;
@@ -42,41 +37,6 @@ const UserHeader = ({ user }) => {
     });
   };
 
-  const handleFollow = async () => {
-    try {
-      setUpdating(true);
-      if(updating) return;
-      const res = await fetch(`/api/users/follow/${user.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      if (data.error) {
-        showToast("Erro", data.error, "error");
-        return;
-      }
-      if (following) {
-        showToast("Sucesso", `Deixou de seguir ${user.username}`, "success");
-        user.followers = user.followers.filter(
-          (follower) => follower.followingId !== currentUser?.id
-        );
-      } else {
-        showToast("Sucesso", `Seguindo ${user.username}`, "success");
-        user.followers.push({
-          followingId: currentUser?.id,
-          followerId: user.id,
-        });
-      }
-      setFollowing(!following);
-    } catch (error) {
-      console.log(error);
-      showToast("Erro", "Erro ao seguir usuário", "error");
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   return (
     <VStack gap={4} alignItems={"start"}>
@@ -122,7 +82,7 @@ const UserHeader = ({ user }) => {
         </RouterLink>
       )}
       {currentUser?.id !== user.id && (
-        <Button size="sm" onClick={handleFollow} isLoading={updating}>
+        <Button size="sm" onClick={handleFollowUnfollow} isLoading={updating}>
           {following ? "Deixar de seguir" : "Seguir"}
         </Button>
       )}

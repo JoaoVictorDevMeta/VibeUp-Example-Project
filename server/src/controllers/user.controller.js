@@ -228,6 +228,50 @@ const updateUser = async (req, res) => {
   }
 };
 
+const getSuggestedUsers = async (req, res) => {
+  try{
+    const userId = req.user.id;
+    
+    const userFollowedByYou = await prisma.follow.findMany({
+      where: {
+        followingId: userId,
+      },
+      select: {
+        followerId: true,
+      },
+    });
+
+    // Extract the IDs of the followed users
+    const followedIds = userFollowedByYou.map(follow => follow.followerId);
+
+    // Find users who are not followed by the current user
+    let suggestedUsers = await prisma.user.findMany({
+      where: {
+        id: {
+          notIn: [...followedIds, userId],
+        },
+      },
+      include: {
+        followers: true,
+      },
+    });
+
+    //remove passwrd
+    suggestedUsers = suggestedUsers.map(user => {
+      const { password: _, ...userInfo } = user;
+      return userInfo;
+    });
+
+    const shuffledUsers = suggestedUsers.sort(() => 0.5 - Math.random());
+    const limitedSuggestions = shuffledUsers.slice(0, 4); 
+
+    res.status(200).json(limitedSuggestions);
+  }catch(err){
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
 export {
   signupUser,
   loginUser,
@@ -235,4 +279,5 @@ export {
   followUnfollowUser,
   updateUser,
   getUserProfile,
+  getSuggestedUsers,
 };

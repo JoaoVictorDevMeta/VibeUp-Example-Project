@@ -47,6 +47,9 @@ Cookie: {{cookie}}
 ### profile
 GET {{baseUrl}}/api/users/profile/joaovictor
 
+### get suggested users
+GET {{baseUrl}}/api/users/suggested
+
 ### create post
 POST {{baseUrl}}/api/posts/create
 Content-Type: application/json

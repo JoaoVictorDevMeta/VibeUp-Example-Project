@@ -1,9 +1,11 @@
 import prisma from "../../prisma/database.js";
 import { getRecipientSocketId, io } from "../socket/socket.js";
+import { v2 as cloudinary } from "cloudinary";
 
 async function sendMessage(req, res) {
   try {
-    const { recipientId, text } = req.body;
+    const { recipientId } = req.body;
+    let {img, text} = req.body;
     const senderId = req.user.id;
 
     let conversation = await prisma.conversation.findFirst({
@@ -31,9 +33,16 @@ async function sendMessage(req, res) {
       });
     }
 
+    if(img){
+      const uploadedImg = await cloudinary.uploader.upload(img);
+      img = uploadedImg.secure_url;
+      text = "";
+    }
+
     const newMessage = await prisma.message.create({
       data: {
         text,
+        img: img || "",
         conversation: {
           connect: {
             id: conversation.id,

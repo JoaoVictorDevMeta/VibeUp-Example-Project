@@ -1,5 +1,5 @@
 import { Container } from "@chakra-ui/layout";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import UserPage from "./pages/UserPage";
 import PostPage from "./pages/PostPage";
@@ -16,9 +16,10 @@ import { Box } from "@chakra-ui/react";
 
 function App() {
   const user = getUserState();
+  const {pathname} = useLocation();
   return (
     <Box position={"relative"} w="full">
-      <Container maxW="620px">
+      <Container maxW={pathname === "/" ? "900px" : "620px"}>
         <Header />
         <Routes>
           <Route
